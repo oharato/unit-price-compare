@@ -1,0 +1,14 @@
+{
+  "short_name": "Unit Price Compare",
+  "name": "Unit Price Compare",
+  "icons": [
+    {
+      "src": "unit_price_compare_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "https://eager-jepsen-bf4853.netlify.app/index.html",
+  "display": "fullscreen",
+  "orientation": "portrait"
+}
