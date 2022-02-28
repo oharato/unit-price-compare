@@ -16,11 +16,18 @@ const app = new Vue({
     compare: httpVueLoader("compare.vue"),
   },
   data: {
-    compares: [{ price: null, amount: null }],
-  },
-  methods: {
-    add() {
-      this.compares.push({ price: null, amount: null });
-    },
+    compares: [
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+      { price: null, amount: null },
+    ],
   },
 });

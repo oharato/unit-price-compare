@@ -1,10 +1,10 @@
 <template>
   <div class="pure-g">
     <div class="pure-u-1-3">
-      <input type="number" v-model.number="localPrice" />
+      <input type="number" v-model.number="price" />
     </div>
     <div class="pure-u-1-3">
-      <input type="number" v-model.number="localAmount" />
+      <input type="number" v-model.number="amount" />
     </div>
     <div class="pure-u-1-3">
       <input type="number" v-model.number="unitPrice" readonly />
@@ -27,24 +27,10 @@ module.exports = {
       type: Number,
     },
   },
-  data() {
-    return {
-      localPrice: this.price,
-      localAmount: this.amount,
-    };
-  },
-  watch: {
-    localPrice(v) {
-      this.$emit("update:price", v);
-    },
-    localAmount(v) {
-      this.$emit("update:amount", v);
-    },
-  },
   computed: {
     unitPrice() {
-      if (!this.localAmount) return 0;
-      return this.localPrice / this.localAmount;
+      if (!this.amount) return 0;
+      return this.price / this.amount;
     },
   },
 };
