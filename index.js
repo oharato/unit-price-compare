@@ -3,7 +3,7 @@ window.addEventListener("load", function () {
     navigator.serviceWorker
       .register("./sw.js")
       .then(function (registration) {
-        console.log("serviceWorker registed.");
+        console.log("serviceWorker registered.");
       })
       .catch(function (error) {
         console.warn("serviceWorker error.", error);
