@@ -21,6 +21,10 @@ function unitPriceApp(){
       this.compares=this.compares.map(()=>({price:null,amount:null}))
     },
     
+    clearRow(i){
+      this.compares[i]={price:null,amount:null}
+    },
+    
     saveToHistory(){
       if(!this.compares.some(c=>c.price||c.amount))return;
       const h=JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]");

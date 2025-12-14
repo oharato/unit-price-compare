@@ -30,6 +30,7 @@
         <input type="number" x-model.number="compares[i].price" placeholder="0" />
         <input type="number" x-model.number="compares[i].amount" placeholder="0" />
         <input type="number" :value="calcUnitPrice(compare)" readonly />
+        <button class="btn-clear" @click="clearRow(i)" title="クリア">×</button>
       </div>
     </template>
 
