@@ -1,10 +1,10 @@
 <template>
   <div class="pure-g">
     <div class="pure-u-1-3">
-      <input type="number" v-model.number="price" />
+      <input type="number" :value="price" @input="$emit('update:price', $event.target.value ? Number($event.target.value) : null)" />
     </div>
     <div class="pure-u-1-3">
-      <input type="number" v-model.number="amount" />
+      <input type="number" :value="amount" @input="$emit('update:amount', $event.target.value ? Number($event.target.value) : null)" />
     </div>
     <div class="pure-u-1-3">
       <input type="number" v-model.number="unitPrice" readonly />

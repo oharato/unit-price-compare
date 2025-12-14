@@ -47,6 +47,7 @@ const app = new Vue({
   data: {
     compares: loadData(),
     history: [],
+    toastMessage: '',
   },
   watch: {
     compares: {
@@ -58,6 +59,16 @@ const app = new Vue({
     },
   },
   methods: {
+    showToast(message) {
+      this.toastMessage = message;
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2000);
+      }
+    },
     clearAll() {
       this.compares = this.compares.map(() => ({ price: null, amount: null }));
     },
@@ -86,7 +97,7 @@ const app = new Vue({
       history.unshift(historyEntry);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
       
-      alert("履歴に保存しました");
+      this.showToast("履歴に保存しました");
     },
     showHistory() {
       // Load history from localStorage
