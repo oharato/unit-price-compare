@@ -1,162 +1,73 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Unit Price Compare</title>
+  <title>単価比較</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css"
-    integrity="sha384-cg6SkqEOCV1NbJoCu11+bm0NvBRc8IYLRGXkmNrqUBfTjmMYwNKPWBTIKyw9mHNJ" crossorigin="anonymous" />
-  <style>
-    .compare {
-      margin-bottom: 10px;
-    }
-
-    .wrap {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: scroll;
-    }
-
-    #app {
-      margin-left: 10px;
-    }
-
-    #app button {
-      display: block;
-      margin: 0 10px 10px auto;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin: 10px 10px 10px auto;
-      justify-content: flex-end;
-    }
-
-    .button-group button {
-      margin: 0;
-    }
-
-    dialog {
-      max-width: 90%;
-      max-height: 80vh;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    dialog::backdrop {
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .history-list {
-      overflow-y: auto;
-      max-height: 60vh;
-    }
-
-    .history-entry {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .history-entry:hover {
-      background-color: #f5f5f5;
-    }
-
-    .history-date {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .history-data {
-      font-size: 0.9em;
-    }
-
-    .history-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      padding: 5px 0;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #4CAF50;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    .toast.show {
-      opacity: 1;
-    }
-  </style>
+  <link rel="stylesheet" href="index.css" />
 </head>
-
 <body>
-  <div class="wrap">
-    <div id="app" class="pure-form">
-      <div class="button-group">
-        <button class="pure-button" @click="clearAll">一括クリア</button>
-        <button class="pure-button" @click="saveToHistory">履歴に保存</button>
-        <button class="pure-button pure-button-primary" @click="showHistory">履歴</button>
+  <div class="container" x-data="unitPriceApp()">
+    <div class="header">
+      <h1>単価比較</h1>
+    </div>
+    
+    <div class="button-group">
+      <button class="btn-secondary" @click="clearAll">一括クリア</button>
+      <button class="btn-secondary" @click="saveToHistory">履歴に保存</button>
+      <button class="btn-primary" @click="showHistory">履歴</button>
+    </div>
+    
+    <div class="table-header">
+      <div>価格</div>
+      <div>量</div>
+      <div>単価</div>
+    </div>
+    
+    <template x-for="(compare, i) in compares" :key="i">
+      <div class="compare-row">
+        <input type="number" x-model.number="compares[i].price" placeholder="0" />
+        <input type="number" x-model.number="compares[i].amount" placeholder="0" />
+        <input type="number" :value="calcUnitPrice(compare)" readonly />
       </div>
-      <div class="pure-g header">
-        <div class="pure-u-1-3">価格</div>
-        <div class="pure-u-1-3">量</div>
-        <div class="pure-u-1-3">単価</div>
-      </div>
-      <compare class="compare" v-for="compare,i in compares" :key="i" :price.sync="compares[i].price" :amount.sync="compares[i].amount"></compare>
+    </template>
 
-      <dialog id="historyModal">
-        <div class="history-header">
-          <h2>履歴</h2>
-          <button class="pure-button" @click="closeHistory">閉じる</button>
+    <dialog x-ref="historyModal" @click.self="closeHistory">
+      <div class="modal-header" @click.stop>
+        <h2>履歴</h2>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn-secondary" @click="clearHistory" x-show="history.length>0">全削除</button>
+          <button class="btn-secondary" @click="closeHistory">閉じる</button>
         </div>
-        <div class="history-list">
-          <div v-if="history.length === 0">
-            <p>履歴はありません</p>
-          </div>
-          <div v-for="(entry, index) in history" :key="index" class="history-entry" @click="loadHistoryEntry(entry)">
-            <div class="history-date">{{ formatDate(entry.date) }}</div>
-            <div class="history-data">
-              <template v-for="(item, i) in entry.data">
-                <div v-if="item.price || item.amount" :key="i" class="history-row">
-                  <div>価格: {{ item.price || '-' }}</div>
-                  <div>量: {{ item.amount || '-' }}</div>
-                  <div>単価: {{ item.price && item.amount ? (item.price / item.amount).toFixed(2) : '-' }}</div>
+      </div>
+      <div class="modal-body" @click.stop>
+        <template x-if="history.length === 0">
+          <div class="empty-state">履歴はありません</div>
+        </template>
+        <template x-for="(entry, index) in history" :key="index">
+          <div class="history-entry">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem">
+              <div class="history-date" x-text="formatDate(entry.date)"></div>
+              <button class="btn-secondary" style="padding:0.25rem 0.5rem;font-size:0.75rem" @click.stop="deleteHistoryEntry(index)">削除</button>
+            </div>
+            <div @click.stop="loadHistoryEntry(entry)" style="cursor:pointer">
+              <template x-for="(item, i) in entry.data" :key="i">
+                <div x-show="item.price || item.amount" class="history-row">
+                  <div x-text="'価格: ' + (item.price || '-')"></div>
+                  <div x-text="'量: ' + (item.amount || '-')"></div>
+                  <div x-text="'単価: ' + (item.price && item.amount ? (item.price / item.amount).toFixed(2) : '-')"></div>
                 </div>
               </template>
             </div>
           </div>
-        </div>
-      </dialog>
-      <div id="toast" class="toast">{{ toastMessage }}</div>
-    </div>
+        </template>
+      </div>
+    </dialog>
+    
+    <div x-ref="toast" class="toast" x-text="toastMessage"></div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/http-vue-loader"></script>
-  <script src="index.js" type="module"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="index.js"></script>
 </body>
-
 </html>
